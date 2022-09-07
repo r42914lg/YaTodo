@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">YaTodo</string>
+    <string name="todo_by_prefix">Сделать до</string>
+    <string name="input_text_placeholder">Что-то надо сделать...</string>
+    <string name="importance_default_menu_text">Нет</string>
+    <string name="importance_low_menu_text">Низкий</string>
+    <string name="importance_high_menu_text">!! Высокий</string>
+    <string name="importance_title">Важность</string>
+    <string name="importance_prefix_high">!!</string>
+    <string name="importance_prefix_low">"\u2193"</string>
+    <string name="importance_prefix_default">""</string>
+    <string name="toolbar_title">Мои дела</string>
+    <string name="toolbar_subtitle">Выполнено - </string>
+    <string name="show_completed_items">Show completed items</string>
+    <!-- Strings used for fragments for navigation -->
+</resources>
