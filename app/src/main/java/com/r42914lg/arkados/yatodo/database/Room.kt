@@ -5,7 +5,10 @@ import androidx.room.*
 @Dao
 interface TodoDao {
     @Insert
-    fun insertItem(items: DbTodoItem)
+    fun insertItem(item: DbTodoItem)
+
+    @Insert
+    fun insertAll(items: List<DbTodoItem>)
 
     @Update
     fun updateItem(item: DbTodoItem)
@@ -18,6 +21,12 @@ interface TodoDao {
 
     @Query("SELECT * FROM dbtodoitem WHERE deletepending == 0")
     fun getNoDelItems() : List<DbTodoItem>
+
+    @Query("SELECT * FROM dbtodoitem WHERE id == :localid")
+    fun isRecordExist(localid: Int): Boolean
+
+    @Query("DELETE FROM dbtodoitem")
+    fun deleteAll()
 }
 
 @Database(entities = [DbTodoItem::class], version = 1)

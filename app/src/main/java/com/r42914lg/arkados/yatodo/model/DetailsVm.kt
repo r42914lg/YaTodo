@@ -44,10 +44,7 @@ class DetailsVm @AssistedInject constructor(
             it.changed = Calendar.getInstance().time
 
             viewModelScope.launch {
-                if (it.id == null)
-                    repo.addTodo(it)
-                else
-                    repo.updateTodo(it)
+                repo.addOrUpdateTodo(it)
             }
         }
     }
@@ -55,9 +52,9 @@ class DetailsVm @AssistedInject constructor(
     fun onDelete() {
         _todoItem.value?.let {
             it.changed = Calendar.getInstance().time
-            it.deletePending = true
+            it.deletepending = true
             viewModelScope.launch {
-                repo.updateTodo(it)
+                repo.addOrUpdateTodo(it)
             }
         }
     }

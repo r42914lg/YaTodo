@@ -3,6 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.r42914lg.arkados.yatodo.MainActivity">
     <item
+        android:id="@+id/login"
+        app:showAsAction="always"
+        android:title="@string/login" />
+    <item
+        android:id="@+id/synchronize"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="always"
+        android:title="@string/sync_menu_text" />
+    <item
         android:id="@+id/show_completed"
         android:icon="@drawable/ic_visibility"
         app:showAsAction="always"

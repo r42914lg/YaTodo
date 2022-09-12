@@ -11,7 +11,7 @@ data class TodoItem(
     val created: Date = Calendar.getInstance().time,
     var deadline: String? = null,
     var changed: Date? = null,
-    var deletePending: Boolean = false
+    var deletepending: Boolean = false
 )
 
 fun TodoItem.asDatabaseModel(): DbTodoItem =
@@ -23,7 +23,7 @@ fun TodoItem.asDatabaseModel(): DbTodoItem =
             created = this.created.time,
             deadline = this.deadline,
             changed = this.changed?.time,
-            deletePending = this.deletePending
+            deletepending = this.deletepending
     )
 
 fun List<TodoItem>.countCompleted() : Int =

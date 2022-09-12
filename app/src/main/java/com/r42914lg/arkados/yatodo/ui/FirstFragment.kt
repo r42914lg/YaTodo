@@ -3,6 +3,7 @@ package com.r42914lg.arkados.yatodo.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -80,5 +81,9 @@ class FirstFragment : Fragment(), ITodoListView {
         list.clear()
         list.addAll(newItems)
         adapter.notifyDataSetChanged()
+    }
+
+    override fun toast(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }

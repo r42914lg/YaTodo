@@ -23,14 +23,26 @@ class FirstFragmentController(
 
     fun initView(binding: FragmentFirstBinding) {
         binding.toolbar.inflateMenu(R.menu.menu_fragment)
-        val showCompleted = binding.toolbar.menu[0]
 
-        mainVm.showCompleted.value?.let {
-            showCompleted.isChecked = it
-            showCompleted.icon = getIconForShowCompleted(it)
+        val  loginMenuItem = binding.toolbar.menu[0]
+        loginMenuItem.setOnMenuItemClickListener {
+            mainVm.handleLoginOrLogoutClick()
+            it.isChecked
         }
 
-        showCompleted.setOnMenuItemClickListener {
+        val  syncMenuItem = binding.toolbar.menu[1]
+
+        syncMenuItem.setOnMenuItemClickListener {
+            mainVm.handleSyncRequest()
+            it.isChecked
+        }
+
+        val showCompletedMenuItem = binding.toolbar.menu[2]
+        mainVm.showCompleted.value?.let {
+            showCompletedMenuItem.isChecked = it
+            showCompletedMenuItem.icon = getIconForShowCompleted(it)
+        }
+        showCompletedMenuItem.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             it.icon = getIconForShowCompleted(it.isChecked)
             mainVm.setShowCompleted(it.isChecked)
@@ -48,6 +60,14 @@ class FirstFragmentController(
 
         mainVm.countCompleted.observe(owner) {
             iTodoListView.setSubtitle("${ctx.getString(R.string.toolbar_subtitle)} $it")
+        }
+
+        mainVm.currentUser.observe(owner) {
+            if (it == null) {
+                loginMenuItem.title = ctx.getString(R.string.login)
+            } else {
+                loginMenuItem.title = ctx.getString(R.string.logout)
+            }
         }
     }
 

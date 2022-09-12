@@ -34,45 +34,36 @@ class SecondFragmentController(
         }
 
         binding.buttonSave.setOnClickListener {
-            log("save clicked")
-
             vm.onSaveItem(
                 binding.todoInputText.text.toString(),
                 Importance.Factory().parseFromStr(binding.importanceValue.text.toString()),
                 binding.todoDate.text.toString()
             )
-
             navigateToFirst()
         }
 
         binding.buttonClose.setOnClickListener {
-            log("save clicked")
             navigateToFirst()
         }
 
         binding.buttonDelete.setOnClickListener {
-            log("save clicked")
             vm.onDelete()
             navigateToFirst()
         }
 
         datePicker.addOnPositiveButtonClickListener {
-            log("date picker value set --> ${datePicker.headerText}")
             binding.todoDate.text = datePicker.headerText
         }
 
         datePicker.addOnNegativeButtonClickListener {
-            log("date picker value NEGATIVE button")
             iTodoDetailsView.setDateSwitchChecked(false)
         }
 
         datePicker.addOnCancelListener {
-            log("date picker value CANCEL button")
             iTodoDetailsView.setDateSwitchChecked(false)
         }
 
         binding.dateSwitch.setOnCheckedChangeListener { _, isChecked ->
-            log("date switch new value is --> $isChecked")
             if (isChecked) {
                 datePicker.show((iTodoDetailsView as Fragment).parentFragmentManager, "TAG");
             }  else {
