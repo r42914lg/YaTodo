@@ -29,4 +29,5 @@ fun TodoItem.asDatabaseModel(): DbTodoItem =
 fun List<TodoItem>.countCompleted() : Int =
     count { it.done }
 
-fun List<TodoItem>.filterNonCompletedOnly() : List<TodoItem> = filter { !it.done }
+fun List<TodoItem>.filterNonCompletedOnly() : List<TodoItem> =
+    filter { !it.done }

@@ -21,7 +21,7 @@ class DbTodoItem constructor(
     val deletepending: Boolean
 )
 
-fun List<DbTodoItem>.asDomainModel(): List<TodoItem> {
+fun List<DbTodoItem>.asDomainModel(): MutableList<TodoItem> {
     return map {
         TodoItem(
             id = it.id,
@@ -32,7 +32,7 @@ fun List<DbTodoItem>.asDomainModel(): List<TodoItem> {
             deadline = it.deadline,
             changed = it.changed?.let { it1 -> Date(it1) },
             deletepending = it.deletepending)
-    }
+    }.toMutableList()
 }
 
 fun List<DbTodoItem>.asNetworkModel(): List<NetworkTotoItem> {

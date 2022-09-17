@@ -1,20 +1,18 @@
 package com.r42914lg.arkados.yatodo.ui
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.r42914lg.arkados.yatodo.databinding.FragmentFirstBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
 import com.r42914lg.arkados.yatodo.log
 import com.r42914lg.arkados.yatodo.model.*
-import com.r42914lg.arkados.yatodo.ui.controller.FirstFragmentController
-
+import com.r42914lg.arkados.yatodo.ui.presenter.FirstFragmentPresenter
 
 class FirstFragment : Fragment(), ITodoListView {
 
@@ -22,7 +20,6 @@ class FirstFragment : Fragment(), ITodoListView {
     private val binding get() = _binding!!
 
     private lateinit var adapter: WorkItemAdapter
-    private val list = mutableListOf<TodoItem>()
 
     private val mainVm: MainVm by activityViewModels {
         VmFactory {
@@ -36,8 +33,8 @@ class FirstFragment : Fragment(), ITodoListView {
         }
     }
 
-    private val controller: FirstFragmentController by lazy {
-        FirstFragmentController(this, mainVm, detailsVm)
+    private val controller: FirstFragmentPresenter by lazy {
+        FirstFragmentPresenter(this, mainVm, detailsVm)
     }
 
     override fun onCreateView(
@@ -52,7 +49,7 @@ class FirstFragment : Fragment(), ITodoListView {
         super.onViewCreated(view, savedInstanceState)
 
         binding.recycler.layoutManager = LinearLayoutManager(context)
-        adapter = WorkItemAdapter(list, requireContext(), controller)
+        adapter = WorkItemAdapter(mutableListOf<TodoItem>(), requireContext(), controller, binding.recycler)
         binding.recycler.adapter = adapter
 
         val itemTouchHelper = ItemTouchHelper(SwipeHandler(adapter))
@@ -76,11 +73,12 @@ class FirstFragment : Fragment(), ITodoListView {
         binding.toolbar.subtitle = text
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun setItems(newItems: List<TodoItem>) {
-        list.clear()
-        list.addAll(newItems)
-        adapter.notifyDataSetChanged()
+    override fun setItems(newItems: MutableList<TodoItem>) {
+        val diffUtilCallback = WorkItemDiffUtils(adapter.getData(), newItems)
+        val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
+
+        adapter.setData(newItems)
+        diffResult.dispatchUpdatesTo(adapter)
     }
 
     override fun toast(text: String) {

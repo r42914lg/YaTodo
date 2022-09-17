@@ -10,15 +10,19 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.r42914lg.arkados.yatodo.R
+import com.r42914lg.arkados.yatodo.getColorFromAttr
 import com.r42914lg.arkados.yatodo.log
 import com.r42914lg.arkados.yatodo.model.*
-import com.r42914lg.arkados.yatodo.ui.controller.FirstFragmentController
+import com.r42914lg.arkados.yatodo.ui.presenter.FirstFragmentPresenter
+
 
 class WorkItemAdapter(
-    private val list: MutableList<TodoItem>,
+    private var list: MutableList<TodoItem>,
     private val _context: Context,
-    private val controller: FirstFragmentController
+    private val controller: FirstFragmentPresenter,
+    private val recyclerView: RecyclerView,
 ) : RecyclerView.Adapter<WorkItemAdapter.WorkItemViewHolder>(),
     View.OnClickListener,
     CompoundButton.OnCheckedChangeListener {
@@ -47,7 +51,9 @@ class WorkItemAdapter(
 
         holder.todoText.text = list[position].text
         holder.todoDate.text = list[position].deadline
-        holder.importanceTextView.text = getImportancePrefixText(list[position].importance)
+        holder.importanceTextView.text = getImportancePrefixText(
+            list[position].importance,
+            holder.doneCheckBox.isChecked)
 
         if (list[position].done)
             holder.todoText.paintFlags = holder.todoText.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -56,7 +62,11 @@ class WorkItemAdapter(
 
         val color = getImportancePrefixColor(list[position].importance)
         holder.importanceTextView.setTextColor(color)
-        holder.doneCheckBox.buttonTintList = ColorStateList.valueOf(color)
+        holder.doneCheckBox.buttonTintList =
+            if (holder.doneCheckBox.isChecked)
+                ColorStateList.valueOf(context.getColorFromAttr(R.attr.markCompleteColor))
+            else
+                ColorStateList.valueOf(context.getColorFromAttr(androidx.appcompat.R.attr.colorControlNormal))
 
         holder.itemView.tag = list[position]
         holder.itemView.setOnClickListener(this)
@@ -66,26 +76,36 @@ class WorkItemAdapter(
         return list.size
     }
 
-    private fun getImportancePrefixText(importance: Importance) : String {
+    private fun getImportancePrefixText(importance: Importance, markedComplete: Boolean) : String {
         return when (importance) {
             LOW -> context.getString(R.string.importance_prefix_low)
             DEFAULT -> context.getString(R.string.importance_prefix_default)
-            HIGH -> context.getString(R.string.importance_prefix_high)
+            HIGH -> if (markedComplete) "" else context.getString(R.string.importance_prefix_high)
         }
     }
 
     private fun getImportancePrefixColor(importance: Importance) : Int {
         return when (importance) {
-            LOW -> context.getColor(R.color.black)
-            DEFAULT -> context.getColor(R.color.black)
-            HIGH -> context.getColor(R.color.red)
+            LOW -> context.getColorFromAttr(com.firebase.ui.auth.R.attr.colorOnPrimary)
+            DEFAULT -> context.getColorFromAttr(com.firebase.ui.auth.R.attr.colorOnPrimary)
+            HIGH -> context.getColorFromAttr(R.attr.swipeDeleteColor)
         }
     }
 
     fun onSwipeToDelete(position: Int) {
-        controller.processDelete(list[position])
+        val deletedItem = list[position]
+        controller.processDelete(deletedItem)
         list.removeAt(position)
         notifyItemRemoved(position)
+
+        Snackbar.make(recyclerView, context.getString(R.string.undo_delete), Snackbar.LENGTH_LONG)
+            .setAction(context.getString(R.string.cancel_deletion)) {
+                controller.processRestore(deletedItem)
+                list.add(position, deletedItem)
+                recyclerView.scrollToPosition(position)
+                notifyItemInserted(position)
+            }
+            .show()
     }
 
     fun onSwipeToComplete(position: Int, flag: Boolean) {
@@ -105,5 +125,13 @@ class WorkItemAdapter(
         list[position].done = isChecked
         notifyItemChanged(position)
         controller.processCompleteChanged(list[position])
+    }
+
+    fun getData(): List<TodoItem> {
+        return list
+    }
+
+    fun setData(newItems: MutableList<TodoItem>) {
+        list = newItems
     }
 }

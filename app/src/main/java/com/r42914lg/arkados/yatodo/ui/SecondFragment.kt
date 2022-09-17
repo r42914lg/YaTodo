@@ -2,17 +2,18 @@ package com.r42914lg.arkados.yatodo.ui
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.r42914lg.arkados.yatodo.R
 import com.r42914lg.arkados.yatodo.databinding.FragmentSecondBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
+import com.r42914lg.arkados.yatodo.getColorFromAttr
 import com.r42914lg.arkados.yatodo.log
+import com.r42914lg.arkados.yatodo.model.DEFAULT
 import com.r42914lg.arkados.yatodo.model.DetailsVm
 import com.r42914lg.arkados.yatodo.model.VmFactory
-import com.r42914lg.arkados.yatodo.ui.controller.FirstFragmentController
-import com.r42914lg.arkados.yatodo.ui.controller.SecondFragmentController
+import com.r42914lg.arkados.yatodo.ui.presenter.SecondFragmentPresenter
 
 class SecondFragment : Fragment(), ITodoDetailsView {
 
@@ -25,8 +26,8 @@ class SecondFragment : Fragment(), ITodoDetailsView {
         }
     }
 
-    private val controller: SecondFragmentController by lazy {
-        SecondFragmentController(this, detailsVm)
+    private val controller: SecondFragmentPresenter by lazy {
+        SecondFragmentPresenter(this, detailsVm)
     }
 
     override fun onCreateView(
@@ -42,6 +43,10 @@ class SecondFragment : Fragment(), ITodoDetailsView {
         super.onViewCreated(view, savedInstanceState)
 
         registerForContextMenu(binding.importanceClickable)
+
+        binding.todoInputText.addTextChangedListener {
+            controller.enableSaveDelete(!it.isNullOrEmpty())
+        }
 
         controller.initView(binding)
         log("onViewCreated")
@@ -61,15 +66,15 @@ class SecondFragment : Fragment(), ITodoDetailsView {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.importance_default -> {
-                binding.importanceValue.text = getString(R.string.importance_default_menu_text)
+                setImportance(getString(R.string.importance_default_menu_text))
                 true
             }
             R.id.importance_low -> {
-                binding.importanceValue.text = getString(R.string.importance_low_menu_text)
+                setImportance(getString(R.string.importance_low_menu_text))
                 true
             }
             R.id.importance_high -> {
-                binding.importanceValue.text = getString(R.string.importance_high_menu_text)
+                setImportance(getString(R.string.importance_high_menu_text))
                 true
             }
             else -> super.onContextItemSelected(item)
@@ -78,10 +83,16 @@ class SecondFragment : Fragment(), ITodoDetailsView {
 
     override fun setImportance(text: String) {
         binding.importanceValue.text = text
+        binding.importanceValue.setTextColor(
+            if (text == DEFAULT.stringRep())
+                requireContext().getColorFromAttr(R.attr.disableColor)
+            else
+                requireContext().getColorFromAttr(com.google.android.material.R.attr.colorOnPrimary)
+        )
     }
 
     override fun setDeadline(text: String) {
-        binding.todoBy.text = text
+        binding.todoDate.text = text
     }
 
     override fun setTodoText(text: String) {

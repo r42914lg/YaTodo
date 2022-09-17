@@ -1,16 +1,22 @@
 package com.r42914lg.arkados.yatodo.utils
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Application
 import android.content.*
 import android.net.NetworkCapabilities
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.ConnectivityManager
 import android.net.NetworkRequest
-import com.r42914lg.arkados.yatodo.model.MainVm
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NetworkTracker constructor(appCompatActivity: AppCompatActivity, vm: MainVm) {
-    private var isOnline = false
+@Singleton
+class NetworkTracker @Inject constructor(app: Application) {
+    private var _isOnline = MutableLiveData(false)
+    val isOnline : LiveData<Boolean>
+        get() = _isOnline
 
     init {
         val networkRequest = NetworkRequest.Builder()
@@ -22,22 +28,16 @@ class NetworkTracker constructor(appCompatActivity: AppCompatActivity, vm: MainV
         val networkCallback: NetworkCallback = object : NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (!isOnline) {
-                    vm.setNetworkStatus(true)
-                }
-                isOnline = true
+                _isOnline.postValue(true)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                if (isOnline) {
-                    vm.setNetworkStatus(false)
-                }
-                isOnline = false
+                _isOnline.postValue(false)
             }
         }
         val connectivityManager =
-            appCompatActivity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }

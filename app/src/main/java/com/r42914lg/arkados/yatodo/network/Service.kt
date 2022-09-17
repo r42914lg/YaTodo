@@ -1,6 +1,7 @@
 package com.r42914lg.arkados.yatodo.network
 
 import android.app.Application
+import com.r42914lg.arkados.yatodo.utils.SharedPrefManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -10,11 +11,8 @@ import retrofit2.http.Body
 import retrofit2.http.PATCH
 import javax.inject.Inject
 import javax.inject.Singleton
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLSession
 
 interface TodoService {
-
     @PATCH("items")
     suspend fun updateAll(@Body request: List<NetworkTotoItem>): Response<List<NetworkTotoItem>>
 }
@@ -46,10 +44,10 @@ class TodoNetwork @Inject constructor(
 }
 
 @Singleton
-class AuthInterceptor @Inject constructor(private val tokenManager: TokenManager) : Interceptor {
+class AuthInterceptor @Inject constructor(private val sharedPrefManager: SharedPrefManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val requestBuilder = chain.request().newBuilder()
-        tokenManager.token?.let {
+        sharedPrefManager.token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
         }
         return chain.proceed(requestBuilder.build())

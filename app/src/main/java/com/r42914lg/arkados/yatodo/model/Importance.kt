@@ -10,9 +10,9 @@ sealed class Importance  {
         const val LOW_CODE = 0
         const val DEFAULT_CODE = 1
         const val HIGH_CODE = 2
-        const val LOW_STR = "Низкий"
-        const val DEFAULT_STR = "Нет"
-        const val HIGH_STR = "!! Высокий"
+        const val LOW_STR = "Low"
+        const val DEFAULT_STR = "Default"
+        const val HIGH_STR = "!! High"
     }
 
     class Factory() {

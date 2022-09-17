@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.r42914lg.arkados.yatodo.R
+import com.r42914lg.arkados.yatodo.getColorFromAttr
 
 class SwipeHandler(private val adapter: WorkItemAdapter) :
     ItemTouchHelper.SimpleCallback(
@@ -15,8 +16,8 @@ class SwipeHandler(private val adapter: WorkItemAdapter) :
 
     private val iconDelete = ContextCompat.getDrawable(adapter.context, R.drawable.ic_delete)
     private val iconComplete = ContextCompat.getDrawable(adapter.context, R.drawable.ic_complete)
-    private val backgroundRight = ColorDrawable(Color.RED)
-    private val backgroundLeft = ColorDrawable(Color.GREEN)
+    private val backgroundRight = ColorDrawable(adapter.context.getColorFromAttr(R.attr.swipeDeleteColor))
+    private val backgroundLeft = ColorDrawable(adapter.context.getColorFromAttr(R.attr.markCompleteColor))
 
     override fun onMove(
         recyclerView: RecyclerView,

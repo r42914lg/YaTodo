@@ -5,15 +5,22 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.r42914lg.arkados.yatodo.R
 import com.r42914lg.arkados.yatodo.databinding.ActivityMainBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
+import com.r42914lg.arkados.yatodo.graph.DaggerActivityComponent
 import com.r42914lg.arkados.yatodo.model.DetailsVm
 import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.VmFactory
-import com.r42914lg.arkados.yatodo.ui.controller.MainController
+import com.r42914lg.arkados.yatodo.ui.presenter.MainPresenter
+import com.r42914lg.arkados.yatodo.utils.PermissionsHelper
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), IMainView {
+
+    @Inject
+    lateinit var permissionsHelper: PermissionsHelper
 
     private lateinit var binding: ActivityMainBinding
 
@@ -29,12 +36,15 @@ class MainActivity : AppCompatActivity(), IMainView {
         }
     }
 
-    private val controller: MainController by lazy {
-        MainController(this, mainVm, detailsVm)
+    private val controller: MainPresenter by lazy {
+        MainPresenter(this, mainVm, detailsVm)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        DaggerActivityComponent.factory().create(this)
+            .inject(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -55,11 +65,19 @@ class MainActivity : AppCompatActivity(), IMainView {
         }
     }
 
+    override fun setNetworkStatus(text: String) {
+        binding.network.text = text
+    }
+
     override fun toast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
     override fun snackBarWithText(text: String) {
-        TODO("Not yet implemented")
+        Snackbar.make(binding.network, text, Snackbar.LENGTH_LONG)
+            .setAction(getString(R.string.snack_refresh)) {
+                controller.onRefresh()
+            }
+            .show()
     }
 }
