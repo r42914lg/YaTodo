@@ -5,11 +5,14 @@ import com.r42914lg.arkados.yatodo.database.asDomainModel
 import com.r42914lg.arkados.yatodo.database.asNetworkModel
 import com.r42914lg.arkados.yatodo.log
 import com.r42914lg.arkados.yatodo.model.*
+import com.r42914lg.arkados.yatodo.network.TodoItemsContainer
 import com.r42914lg.arkados.yatodo.network.TodoService
-import com.r42914lg.arkados.yatodo.utils.SharedPrefManager
+import com.r42914lg.arkados.yatodo.utils.UserManager
 import com.r42914lg.arkados.yatodo.network.asDatabaseModel
 import com.r42914lg.arkados.yatodo.repository.IRepo.Companion.CODE_FOR_EXCEPTION
 import com.r42914lg.arkados.yatodo.repository.IRepo.Companion.REFRESH_INTERVAL
+import com.r42914lg.arkados.yatodo.utils.DeviceIdManager
+import com.r42914lg.arkados.yatodo.utils.FirebaseHelper
 import com.r42914lg.arkados.yatodo.utils.NetworkTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -38,7 +41,8 @@ class YaTodoRepo @Inject constructor(
     private val roomDao: TodoDao,
     private val networkService: TodoService,
     private val networkTracker: NetworkTracker,
-    private val sharedPrefManager: SharedPrefManager,
+    private val userManager: UserManager,
+    private val deviceIdManager: DeviceIdManager,
     ) : IRepo {
 
     private var _apiResultListener: IApiErrorListener? = null
@@ -47,7 +51,7 @@ class YaTodoRepo @Inject constructor(
     private val flowTodoItems = flow {
         while (true) {
             if (networkTracker.isOnline.value == true
-                    && !sharedPrefManager.token.isNullOrEmpty() && syncAll(false) == 200) {
+                    && !userManager.token.isNullOrEmpty() && syncAll(false) == 200) {
 
                 log("emitting list items...")
                 emit(getTodoList())
@@ -80,7 +84,10 @@ class YaTodoRepo @Inject constructor(
     override suspend fun syncAll(calledByUser:Boolean) : Int {
         val resultCode = withContext(Dispatchers.IO) {
             try {
-                val response = networkService.updateAll(roomDao.getAllItems().asNetworkModel())
+                val response = networkService.updateAll(
+                    TodoItemsContainer(
+                        roomDao.getAllItems().asNetworkModel(),
+                        deviceIdManager.deviceId))
                 if (response.isSuccessful) {
                     response.body()?.let {
                         roomDao.deleteAll()
@@ -92,6 +99,7 @@ class YaTodoRepo @Inject constructor(
                 return@withContext response.code()
             } catch (e: Exception) {
                 e.printStackTrace()
+                e.message?.let { FirebaseHelper.logServerError(it) }
                 return@withContext CODE_FOR_EXCEPTION
             }
         }

@@ -1,7 +1,9 @@
 package com.r42914lg.arkados.yatodo.network
 
 import android.app.Application
-import com.r42914lg.arkados.yatodo.utils.SharedPrefManager
+import com.r42914lg.arkados.yatodo.YaTodoApp.Companion.BASE_URL
+import com.r42914lg.arkados.yatodo.utils.UserManager
+import com.squareup.moshi.JsonClass
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Response
@@ -12,9 +14,12 @@ import retrofit2.http.PATCH
 import javax.inject.Inject
 import javax.inject.Singleton
 
+@JsonClass(generateAdapter = true)
+data class TodoItemsContainer(val items: List<NetworkTotoItem>, val deviceId: String)
+
 interface TodoService {
     @PATCH("items")
-    suspend fun updateAll(@Body request: List<NetworkTotoItem>): Response<List<NetworkTotoItem>>
+    suspend fun updateAll(@Body request: TodoItemsContainer): Response<List<NetworkTotoItem>>
 }
 
 @Singleton
@@ -24,7 +29,7 @@ class TodoNetwork @Inject constructor(
 ) {
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://10.0.2.2:8443/")
+        .baseUrl(BASE_URL)
         .addConverterFactory(MoshiConverterFactory.create())
         .client(okhttpClient())
         .build()
@@ -34,20 +39,20 @@ class TodoNetwork @Inject constructor(
         get() = _service
 
     private fun okhttpClient(): OkHttpClient {
-        val sslContext = SslUtils.getSslContextForCertificateFile("mypublic.cert", app)
         return OkHttpClient.Builder()
-            .hostnameVerifier { _, _ -> true } // ignore hostname verification for testing purposes
+//  for testing purposes uncomment and add certificate file to /resources -->
+//            .hostnameVerifier { _, _ -> true } // ignore hostname verification for testing purposes
+//            .sslSocketFactory(SslUtils.getSslContextForCertificateFile("mypublic.cert", app).socketFactory)
             .addInterceptor(authInterceptor)
-            .sslSocketFactory(sslContext.socketFactory)
             .build()
     }
 }
 
 @Singleton
-class AuthInterceptor @Inject constructor(private val sharedPrefManager: SharedPrefManager) : Interceptor {
+class AuthInterceptor @Inject constructor(private val userManager: UserManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val requestBuilder = chain.request().newBuilder()
-        sharedPrefManager.token?.let {
+        userManager.token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
         }
         return chain.proceed(requestBuilder.build())

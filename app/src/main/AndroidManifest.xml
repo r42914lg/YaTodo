@@ -4,6 +4,8 @@
     package="com.r42914lg.arkados.yatodo">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!--uses-permission android:name="android.permission.WRITE_SETTINGS" /-->
 
     <application
         android:name=".YaTodoApp"

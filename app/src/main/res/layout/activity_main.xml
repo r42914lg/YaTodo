@@ -15,12 +15,24 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@drawable/ic_add"
+        android:contentDescription="@string/cd_fab"/>
 
     <TextView
         android:id="@+id/user"
+        android:layout_marginStart="200dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        />
+
+    <TextView
+        android:id="@+id/network"
         android:layout_marginStart="20dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginEnd="220dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

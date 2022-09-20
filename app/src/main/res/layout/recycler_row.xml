@@ -8,14 +8,18 @@
         android:id="@+id/todo_done"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/cd_complete"/>
 
     <TextView
         android:id="@+id/todo_importance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/todo_done"
         app:layout_constraintStart_toEndOf="@+id/todo_done"/>
 
     <TextView
@@ -24,22 +28,28 @@
         android:maxLines="3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/todo_done"
         app:layout_constraintStart_toEndOf="@+id/todo_importance"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"/>
+        app:layout_constraintEnd_toStartOf="@+id/infoIcon"/>
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/infoIcon"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:src="@android:drawable/ic_menu_info_details"
+        android:layout_margin="5dp"
+        android:src="@drawable/ic_info_24"
+        app:layout_constraintBottom_toBottomOf="@+id/todo_done"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/cd_open"/>
 
     <TextView
         android:id="@+id/todo_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         app:layout_constraintTop_toBottomOf="@+id/todo_text"
         app:layout_constraintStart_toStartOf="@+id/todo_importance"/>
 

@@ -4,16 +4,40 @@
     tools:context="com.r42914lg.arkados.yatodo.MainActivity">
     <item
         android:id="@+id/login"
+        android:icon="@drawable/ic_animated_login_24"
         app:showAsAction="always"
         android:title="@string/login" />
+
     <item
         android:id="@+id/synchronize"
-        android:icon="@drawable/ic_refresh"
+        android:icon="@drawable/ic_animated_refresh_24"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="always"
         android:title="@string/sync_menu_text" />
+
     <item
         android:id="@+id/show_completed"
         android:icon="@drawable/ic_visibility"
+        app:iconTint="?attr/colorOnPrimary"
         app:showAsAction="always"
         android:title="@string/show_completed_items" />
+
+    <item
+        android:title="@string/options"
+        app:showAsAction="always"
+        app:iconTint="?attr/colorOnPrimary"
+        android:icon="@drawable/ic_three_dots">
+
+        <menu>
+            <item
+                android:id="@+id/autosync"
+                app:showAsAction="always"
+                android:title="@string/autosync_menu_text" />
+
+            <item android:id="@+id/theme"
+                app:showAsAction="always"
+                android:title="@string/theme_menu" />
+        </menu>
+
+    </item>
 </menu>

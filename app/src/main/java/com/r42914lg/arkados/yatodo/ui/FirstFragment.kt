@@ -1,6 +1,7 @@
 package com.r42914lg.arkados.yatodo.ui
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -8,6 +9,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.perf.ktx.performance
+import com.r42914lg.arkados.yatodo.R
 import com.r42914lg.arkados.yatodo.databinding.FragmentFirstBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
 import com.r42914lg.arkados.yatodo.log
@@ -20,6 +24,7 @@ class FirstFragment : Fragment(), ITodoListView {
     private val binding get() = _binding!!
 
     private lateinit var adapter: WorkItemAdapter
+    private val myTrace = Firebase.performance.newTrace("test_trace")
 
     private val mainVm: MainVm by activityViewModels {
         VmFactory {
@@ -37,6 +42,13 @@ class FirstFragment : Fragment(), ITodoListView {
         FirstFragmentPresenter(this, mainVm, detailsVm)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.fade)
+        enterTransition = inflater.inflateTransition(R.transition.slide_left)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,6 +59,8 @@ class FirstFragment : Fragment(), ITodoListView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        myTrace.start()
 
         binding.recycler.layoutManager = LinearLayoutManager(context)
         adapter = WorkItemAdapter(mutableListOf<TodoItem>(), requireContext(), controller, binding.recycler)
@@ -79,6 +93,8 @@ class FirstFragment : Fragment(), ITodoListView {
 
         adapter.setData(newItems)
         diffResult.dispatchUpdatesTo(adapter)
+
+        myTrace.stop()
     }
 
     override fun toast(text: String) {

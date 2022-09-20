@@ -1,17 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Theme.YaTodo" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name="android:colorBackground">@color/light_back_primary</item>
+        <item name="colorPrimary">@color/light_back_primary</item>
+        <item name="colorPrimaryVariant">@color/light_back_primary</item>
+        <item name="colorOnPrimary">@color/light_color_blue</item>
+        <item name="colorSecondary">@color/dark_color_blue</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
+
+        <!-- My color attributes -->
+        <item name="markCompleteColor">@color/light_color_green</item>
+        <item name="swipeDeleteColor">@color/light_color_red</item>
+        <item name="colorControlNormal">@color/light_label_tertiary</item>
+        <item name="recyclerAndEditTextAreaColor">@color/color_white</item>
+        <item name="disableColor">@color/light_label_disable</item>
+        <item name="themeBackground">@color/light_back_primary</item>
     </style>
 
     <style name="Theme.YaTodo.NoActionBar">
@@ -19,7 +22,43 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.YaTodo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.YaTodo.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.YaTodo.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="Theme.YaTodo.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Recycler">
+        <item name="android:background">?attr/recyclerAndEditTextAreaColor</item>
+    </style>
+
+    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">?attr/recyclerAndEditTextAreaColor</item>
+    </style>
+
+    <style name="GeneralBorderlessButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/savecolorselector</item>
+    </style>
+
+    <style name="DeleteBorderlessButton" parent="Widget.MaterialComponents.Button.TextButton.Icon">
+        <item name="android:textColor">@color/trashcolorselector</item>
+        <item name="iconTint">@color/trashcolorselector</item>
+    </style>
+
+    <style name="BlueTextView" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="DatePicker" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="materialCalendarHeaderToggleButton">@style/HeaderToggleButtonGone</item>
+        <item name="buttonBarPositiveButtonStyle">@style/CalendarTextButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/CalendarTextButton</item>
+    </style>
+
+    <style name="HeaderToggleButtonGone" parent="@style/Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="CalendarTextButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/recyclerAndEditTextAreaColor</item>
+    </style>
+
 </resources>

@@ -1,16 +1,17 @@
 package com.r42914lg.arkados.yatodo.ui.presenter
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.navigation.Navigation
 import com.r42914lg.arkados.yatodo.R
-import com.r42914lg.arkados.yatodo.animation.ShakeAnimator
 import com.r42914lg.arkados.yatodo.databinding.FragmentFirstBinding
 import com.r42914lg.arkados.yatodo.getColorFromAttr
 import com.r42914lg.arkados.yatodo.log
-import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.DetailsVm
+import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.TodoItem
 import com.r42914lg.arkados.yatodo.ui.FirstFragment
 import com.r42914lg.arkados.yatodo.ui.ITodoListView
@@ -25,12 +26,14 @@ class FirstFragmentPresenter(
     private val owner = (iTodoListView as FirstFragment).viewLifecycleOwner
     private lateinit var _binding: FragmentFirstBinding
     private lateinit var loginMenuItem: MenuItem
+    private lateinit var syncMenuItem: MenuItem
 
     fun initView(binding: FragmentFirstBinding) {
         _binding = binding
         binding.toolbar.inflateMenu(R.menu.menu_fragment)
         binding.toolbar.setBackgroundColor(ctx.getColorFromAttr(R.attr.themeBackground))
 
+        mainVm.setShowFab(true)
         configureMenuItems()
 
         mainVm.todoItems.observe(owner) {
@@ -46,11 +49,16 @@ class FirstFragmentPresenter(
         }
 
         mainVm.currentUserName.observe(owner) {
-            if (it == null) {
-                loginMenuItem.title = ctx.getString(R.string.login)
-            } else {
-                loginMenuItem.title = ctx.getString(R.string.logout)
-            }
+            loginMenuItem.icon = getIconForSignin(!it.isNullOrEmpty())
+            if (loginMenuItem.icon is Animatable)
+                (loginMenuItem.icon as Animatable).start()
+        }
+
+        mainVm.syncRequestInProgress.observe(owner) {
+            if (it)
+                (syncMenuItem.icon as Animatable).start()
+            else
+                (syncMenuItem.icon as Animatable).stop()
         }
     }
 
@@ -61,9 +69,9 @@ class FirstFragmentPresenter(
             it.isChecked
         }
 
-        val syncMenuItem = _binding.toolbar.menu.findItem(R.id.synchronize)
+        syncMenuItem = _binding.toolbar.menu.findItem(R.id.synchronize)
         syncMenuItem.setOnMenuItemClickListener {
-            mainVm.handleSyncRequest()
+            mainVm.handleSyncRequest(true)
             it.isChecked
         }
 
@@ -130,9 +138,15 @@ class FirstFragmentPresenter(
         navController.navigate(R.id.action_FirstFragment_to_SettingsFragment)
     }
 
-    private fun getIconForShowCompleted(needToShowFlag: Boolean) : Drawable? =
+    private fun getIconForShowCompleted(needToShowFlag: Boolean) =
         if (needToShowFlag)
             ContextCompat.getDrawable(ctx, R.drawable.ic_visibility_off)
         else
             ContextCompat.getDrawable(ctx, R.drawable.ic_visibility)
+
+    private fun getIconForSignin(signInFlag: Boolean) =
+        if (signInFlag)
+            ContextCompat.getDrawable(ctx, R.drawable.ic_logout_24)
+        else
+            ContextCompat.getDrawable(ctx, R.drawable.ic_animated_login_24)
 }

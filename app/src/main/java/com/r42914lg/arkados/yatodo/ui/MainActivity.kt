@@ -7,9 +7,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.r42914lg.arkados.yatodo.R
+import com.r42914lg.arkados.yatodo.animation.PulseAnimator
 import com.r42914lg.arkados.yatodo.databinding.ActivityMainBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
 import com.r42914lg.arkados.yatodo.graph.DaggerActivityComponent
+import com.r42914lg.arkados.yatodo.model.AuxVm
 import com.r42914lg.arkados.yatodo.model.DetailsVm
 import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.VmFactory
@@ -24,6 +26,10 @@ class MainActivity : AppCompatActivity(), IMainView {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val pulseAnimator: PulseAnimator by lazy {
+        PulseAnimator(binding.fab)
+    }
+
     private val mainVm: MainVm by viewModels {
         VmFactory {
             getAppComponent().getMainFactory().create()
@@ -36,8 +42,14 @@ class MainActivity : AppCompatActivity(), IMainView {
         }
     }
 
+    private val auxVm: AuxVm by viewModels {
+        VmFactory {
+            getAppComponent().getAuxFactory().create()
+        }
+    }
+
     private val controller: MainPresenter by lazy {
-        MainPresenter(this, mainVm, detailsVm)
+        MainPresenter(this, mainVm, detailsVm, auxVm)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,5 +91,16 @@ class MainActivity : AppCompatActivity(), IMainView {
                 controller.onRefresh()
             }
             .show()
+    }
+
+    override fun showFab(showFlag: Boolean) {
+        binding.fab.visibility = if (showFlag) View.VISIBLE else View.INVISIBLE
+    }
+
+    override fun animateFab(animateFlag: Boolean) {
+        if (animateFlag)
+            pulseAnimator.start()
+        else
+            pulseAnimator.stop()
     }
 }

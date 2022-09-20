@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -35,6 +36,7 @@ class WorkItemAdapter(
         val importanceTextView: TextView = itemView.findViewById(R.id.todo_importance)
         val todoText: TextView = itemView.findViewById(R.id.todo_text)
         val todoDate: TextView = itemView.findViewById(R.id.todo_date)
+        val iconImageView: ImageView = itemView.findViewById(R.id.infoIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkItemViewHolder {
@@ -70,6 +72,9 @@ class WorkItemAdapter(
 
         holder.itemView.tag = list[position]
         holder.itemView.setOnClickListener(this)
+
+        holder.iconImageView.imageTintList = ColorStateList.valueOf(
+            context.getColorFromAttr(androidx.appcompat.R.attr.colorControlNormal))
     }
 
     override fun getItemCount(): Int {

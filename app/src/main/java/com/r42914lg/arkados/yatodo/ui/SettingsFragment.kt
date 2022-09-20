@@ -1,6 +1,7 @@
 package com.r42914lg.arkados.yatodo.ui
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -10,6 +11,7 @@ import com.r42914lg.arkados.yatodo.R
 import com.r42914lg.arkados.yatodo.databinding.FragmentSettingsBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
 import com.r42914lg.arkados.yatodo.log
+import com.r42914lg.arkados.yatodo.model.AuxVm
 import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.VmFactory
 import com.r42914lg.arkados.yatodo.utils.Theme
@@ -19,10 +21,17 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
 
-    private val mainVm: MainVm by activityViewModels {
+    private val auxVm: AuxVm by activityViewModels {
         VmFactory {
-            getAppComponent().getMainFactory().create()
+            getAppComponent().getAuxFactory().create()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.fade)
+        enterTransition = inflater.inflateTransition(R.transition.slide_right)
     }
 
     override fun onCreateView(
@@ -45,20 +54,20 @@ class SettingsFragment : Fragment() {
     }
 
     private fun init() {
-        when (mainVm.uiTheme.value) {
+        when (auxVm.uiTheme.value) {
             Theme.LIGHT -> binding.light.isChecked = true
             Theme.DARK -> binding.dark.isChecked = true
             Theme.SYS_DEFAULT -> binding.systemDefault.isChecked = true
         }
 
         binding.dark.setOnClickListener {
-            mainVm.storeUiTheme(Theme.DARK)
+            auxVm.storeUiTheme(Theme.DARK)
         }
         binding.light.setOnClickListener {
-            mainVm.storeUiTheme(Theme.LIGHT)
+            auxVm.storeUiTheme(Theme.LIGHT)
         }
         binding.systemDefault.setOnClickListener {
-            mainVm.storeUiTheme(Theme.SYS_DEFAULT)
+            auxVm.storeUiTheme(Theme.SYS_DEFAULT)
         }
 
         binding.toolbar.title = getString(R.string.settings_title)

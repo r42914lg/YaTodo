@@ -1,6 +1,7 @@
 package com.r42914lg.arkados.yatodo.graph
 
 import android.app.Application
+import com.r42914lg.arkados.yatodo.model.AuxVm
 import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.DetailsVm
 import dagger.BindsInstance
@@ -18,4 +19,5 @@ interface AppComponent {
 
     fun getMainFactory(): MainVm.Factory
     fun getTodoDetailsFactory(): DetailsVm.Factory
+    fun getAuxFactory(): AuxVm.Factory
 }

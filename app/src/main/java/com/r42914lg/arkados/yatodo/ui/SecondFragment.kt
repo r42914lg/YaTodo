@@ -1,6 +1,7 @@
 package com.r42914lg.arkados.yatodo.ui
 
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.*
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -10,9 +11,7 @@ import com.r42914lg.arkados.yatodo.databinding.FragmentSecondBinding
 import com.r42914lg.arkados.yatodo.getAppComponent
 import com.r42914lg.arkados.yatodo.getColorFromAttr
 import com.r42914lg.arkados.yatodo.log
-import com.r42914lg.arkados.yatodo.model.DEFAULT
-import com.r42914lg.arkados.yatodo.model.DetailsVm
-import com.r42914lg.arkados.yatodo.model.VmFactory
+import com.r42914lg.arkados.yatodo.model.*
 import com.r42914lg.arkados.yatodo.ui.presenter.SecondFragmentPresenter
 
 class SecondFragment : Fragment(), ITodoDetailsView {
@@ -26,8 +25,21 @@ class SecondFragment : Fragment(), ITodoDetailsView {
         }
     }
 
+    private val mainVm: MainVm by activityViewModels {
+        VmFactory {
+            getAppComponent().getMainFactory().create()
+        }
+    }
+
     private val controller: SecondFragmentPresenter by lazy {
-        SecondFragmentPresenter(this, detailsVm)
+        SecondFragmentPresenter(this, detailsVm, mainVm)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflater = TransitionInflater.from(requireContext())
+        exitTransition = inflater.inflateTransition(R.transition.fade)
+        enterTransition = inflater.inflateTransition(R.transition.slide_right)
     }
 
     override fun onCreateView(
@@ -66,25 +78,28 @@ class SecondFragment : Fragment(), ITodoDetailsView {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.importance_default -> {
-                setImportance(getString(R.string.importance_default_menu_text))
+                setImportance(DEFAULT)
+                controller.onImportanceSelected(DEFAULT)
                 true
             }
             R.id.importance_low -> {
-                setImportance(getString(R.string.importance_low_menu_text))
+                setImportance(LOW)
+                controller.onImportanceSelected(LOW)
                 true
             }
             R.id.importance_high -> {
-                setImportance(getString(R.string.importance_high_menu_text))
+                setImportance(HIGH)
+                controller.onImportanceSelected(HIGH)
                 true
             }
             else -> super.onContextItemSelected(item)
         }
     }
 
-    override fun setImportance(text: String) {
-        binding.importanceValue.text = text
+    override fun setImportance(importance: Importance) {
+        binding.importanceValue.text = getStringRep(importance)
         binding.importanceValue.setTextColor(
-            if (text == DEFAULT.stringRep())
+            if (importance == DEFAULT)
                 requireContext().getColorFromAttr(R.attr.disableColor)
             else
                 requireContext().getColorFromAttr(com.google.android.material.R.attr.colorOnPrimary)
@@ -102,4 +117,11 @@ class SecondFragment : Fragment(), ITodoDetailsView {
     override fun setDateSwitchChecked(boolean: Boolean) {
         binding.dateSwitch.isChecked = boolean
     }
+
+    private fun getStringRep(importance: Importance) =
+        when (importance) {
+            DEFAULT -> getString(R.string.importance_default_menu_text)
+            HIGH -> getString(R.string.importance_high_menu_text)
+            LOW -> getString(R.string.importance_low_menu_text)
+        }
 }

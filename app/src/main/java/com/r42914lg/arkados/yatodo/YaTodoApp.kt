@@ -11,4 +11,11 @@ class YaTodoApp : Application() {
         super.onCreate()
         appComponent = DaggerAppComponent.factory().create(this)
     }
+
+    companion object {
+        const val LOG = true
+
+        // "https://10.0.2.2:8443/"
+        const val BASE_URL = "https://d5dtbgsodb2erid89lun.apigw.yandexcloud.net/"
+    }
 }

@@ -1,5 +1,6 @@
 package com.r42914lg.arkados.yatodo.ui
 
+import com.r42914lg.arkados.yatodo.model.Importance
 import com.r42914lg.arkados.yatodo.model.TodoItem
 
 interface IMainView {
@@ -7,6 +8,8 @@ interface IMainView {
     fun setNetworkStatus(text: String)
     fun toast(text: String)
     fun snackBarWithText(text: String)
+    fun showFab(showFlag: Boolean)
+    fun animateFab(animateFlag: Boolean)
 }
 
 interface ITodoListView {
@@ -17,7 +20,7 @@ interface ITodoListView {
 }
 
 interface ITodoDetailsView {
-    fun setImportance(text: String)
+    fun setImportance(importance: Importance)
     fun setDeadline(text: String)
     fun setTodoText(text: String)
     fun setDateSwitchChecked(boolean: Boolean)
