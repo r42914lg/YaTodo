@@ -1,5 +1,6 @@
 package com.r42914lg.arkados.yatodo.ui.presenter
 
+import android.content.res.ColorStateList
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.MenuItem
@@ -27,6 +28,7 @@ class FirstFragmentPresenter(
     private lateinit var _binding: FragmentFirstBinding
     private lateinit var loginMenuItem: MenuItem
     private lateinit var syncMenuItem: MenuItem
+    private lateinit var autoSyncMenuItem: MenuItem
 
     fun initView(binding: FragmentFirstBinding) {
         _binding = binding
@@ -60,6 +62,10 @@ class FirstFragmentPresenter(
             else
                 (syncMenuItem.icon as Animatable).stop()
         }
+
+        mainVm.autoRefresh.observe(owner) {
+            setMenuItemAutoRefreshStatus(it)
+        }
     }
 
     private fun configureMenuItems() {
@@ -88,15 +94,12 @@ class FirstFragmentPresenter(
             it.isChecked
         }
 
-        val autoSyncMenuItem = _binding.toolbar.menu.findItem(R.id.autosync)
+        autoSyncMenuItem = _binding.toolbar.menu.findItem(R.id.autosync)
         autoSyncMenuItem.setOnMenuItemClickListener {
             it.isChecked = !it.isChecked
             log("AUTO SYNC is ${it.isChecked}")
             mainVm.setAutoRefresh(it.isChecked)
-            if (it.isChecked)
-                autoSyncMenuItem.setIcon(R.drawable.ic_checked)
-            else
-                autoSyncMenuItem.icon = null
+            setMenuItemAutoRefreshStatus(it.isChecked)
             it.isChecked
         }
 
@@ -149,4 +152,13 @@ class FirstFragmentPresenter(
             ContextCompat.getDrawable(ctx, R.drawable.ic_logout_24)
         else
             ContextCompat.getDrawable(ctx, R.drawable.ic_animated_login_24)
+
+    private fun setMenuItemAutoRefreshStatus(autoRefreshFlag: Boolean) {
+        if (autoRefreshFlag) {
+            autoSyncMenuItem.setIcon(R.drawable.ic_checked)
+            autoSyncMenuItem.iconTintList = ColorStateList.valueOf(
+                ctx.getColorFromAttr(androidx.appcompat.R.attr.colorControlNormal))
+        } else
+            autoSyncMenuItem.icon = null
+    }
 }

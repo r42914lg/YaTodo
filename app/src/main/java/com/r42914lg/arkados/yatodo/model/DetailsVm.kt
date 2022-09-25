@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class DetailsVm @AssistedInject constructor(
-    private val app: Application,
+    app: Application,
     private val repo: IRepo,
 ) : AndroidViewModel(app) {
 

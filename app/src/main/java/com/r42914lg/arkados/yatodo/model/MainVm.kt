@@ -4,23 +4,22 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseUser
 import com.r42914lg.arkados.yatodo.R
+import com.r42914lg.arkados.yatodo.idling.launchIdling
 import com.r42914lg.arkados.yatodo.log
-import com.r42914lg.arkados.yatodo.utils.UserManager
 import com.r42914lg.arkados.yatodo.repository.IRepo
-import com.r42914lg.arkados.yatodo.utils.FirebaseHelper
-import com.r42914lg.arkados.yatodo.utils.NetworkTracker
+import com.r42914lg.arkados.yatodo.utils.INetworkTracker
+import com.r42914lg.arkados.yatodo.utils.IUserManager
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.util.*
 
 class MainVm @AssistedInject constructor(
     private val app: Application,
     private val repo: IRepo,
-    private val userManager: UserManager,
-    networkTracker: NetworkTracker,
-) : AndroidViewModel(app), IApiErrorListener {
+    private val userManager: IUserManager,
+    networkTracker: INetworkTracker,
+) : AndroidViewModel(app) {
 
     @AssistedFactory
     interface Factory {
@@ -28,7 +27,7 @@ class MainVm @AssistedInject constructor(
     }
 
     private var pendingSyncUponSignin = false
-    private lateinit var autoSynJob: Job
+    private lateinit var autoSyncJob: Job
 
     private var _animateFab = MutableLiveData(false)
     val animateFab: LiveData<Boolean>
@@ -68,18 +67,25 @@ class MainVm @AssistedInject constructor(
     }
 
     private val _autoRefresh = MutableLiveData(false)
+    val autoRefresh: LiveData<Boolean>
+        get() = _autoRefresh
+
     fun setAutoRefresh(value: Boolean) {
         _autoRefresh.value = value
         if (value)
-            autoSynJob = viewModelScope.launch {
+            autoSyncJob = viewModelScope.launchIdling {
                 log("setAutoRefresh -> obtaining flow...")
                 repo.getFlow().collect {
-                    countCompleteAndFilter(it)
+                    when (it.httpCode) {
+                        200 -> countCompleteAndFilter(it.items)
+                        401 -> onCode401()
+                        else -> onOther()
+                    }
                 }
             }
         else {
             log("setAutoRefresh -> cancelling flow...")
-            autoSynJob.cancel()
+            autoSyncJob.cancel()
         }
     }
 
@@ -104,13 +110,12 @@ class MainVm @AssistedInject constructor(
         get() = _eventLogoutRequest
 
     init {
-        repo.setResultListener(this)
         prepareList()
     }
 
     fun prepareList() {
         log("prepareList")
-        viewModelScope.launch {
+        viewModelScope.launchIdling {
             countCompleteAndFilter(repo.getTodoList())
         }
     }
@@ -130,7 +135,7 @@ class MainVm @AssistedInject constructor(
     fun onDeleteOrRestore(item: TodoItem, restoreFlag: Boolean) {
         item.deletepending = !restoreFlag
         item.changed = Calendar.getInstance().time
-        viewModelScope.launch {
+        viewModelScope.launchIdling {
             repo.addOrUpdateTodo(item)
             prepareList()
         }
@@ -138,7 +143,7 @@ class MainVm @AssistedInject constructor(
 
     fun onCompleteChanged(item: TodoItem) {
         item.changed = Calendar.getInstance().time
-        viewModelScope.launch {
+        viewModelScope.launchIdling {
             repo.addOrUpdateTodo(item)
         }
         _countCompleted.value = todoItems.value?.countCompleted() ?: 0
@@ -161,11 +166,15 @@ class MainVm @AssistedInject constructor(
         }
 
         log("handleSyncRequest --> starting network request...")
-        viewModelScope.launch {
+        viewModelScope.launchIdling {
             _syncRequestInProgress.value = true
-            if (repo.syncAll(true) == 200) {
-                _syncRequestInProgress.value = false
-                prepareList()
+            when (repo.syncAll(true)) {
+                200 -> {
+                    _syncRequestInProgress.value = false
+                    prepareList()
+                }
+                401 -> onCode401()
+                else -> onOther()
             }
         }
     }
@@ -214,27 +223,27 @@ class MainVm @AssistedInject constructor(
             log("handleLoginOrLogoutClick -> initiate logout...")
             _toastToUi.value = app.getString(R.string.items_deleted_message)
             _eventLogoutRequest.value = true
-            viewModelScope.launch {
+            viewModelScope.launchIdling {
                 repo.clearAllLocal()
                 prepareList()
             }
         }
     }
 
-    override fun onCode401() {
-        log("onCode401")
-        _eventSigninRefreshRequest.value = true
-    }
-
-    override fun onOther() {
-        log("onOther")
-        _syncRequestInProgress.value = false
-        _toastToUi.value = app.getString(R.string.server_error_message)
-    }
-
     fun onSingOut() {
         log("onSingOut")
         _eventLogoutRequest.value = false
         userManager.clearAuthToken()
+    }
+
+    private fun onCode401() {
+        log("onCode401")
+        _eventSigninRefreshRequest.value = true
+    }
+
+    private fun onOther() {
+        log("onOther")
+        _syncRequestInProgress.value = false
+        _toastToUi.value = app.getString(R.string.server_error_message)
     }
 }

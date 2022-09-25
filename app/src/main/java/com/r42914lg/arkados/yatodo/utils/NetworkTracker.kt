@@ -12,10 +12,14 @@ import androidx.lifecycle.MutableLiveData
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
-class NetworkTracker @Inject constructor(app: Application) {
-    private var _isOnline = MutableLiveData(false)
+interface INetworkTracker {
     val isOnline : LiveData<Boolean>
+}
+
+@Singleton
+class NetworkTracker @Inject  constructor(app: Application) : INetworkTracker {
+    private var _isOnline = MutableLiveData(false)
+    override val isOnline : LiveData<Boolean>
         get() = _isOnline
 
     init {
@@ -41,4 +45,10 @@ class NetworkTracker @Inject constructor(app: Application) {
 
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
+}
+
+@Singleton
+class NetworkTrackerTest @Inject constructor(): INetworkTracker {
+    override val isOnline : LiveData<Boolean>
+        get() = MutableLiveData(true)
 }

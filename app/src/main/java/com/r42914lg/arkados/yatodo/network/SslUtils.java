@@ -2,7 +2,6 @@ package com.r42914lg.arkados.yatodo.network;
 
 import android.content.Context;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.SecureRandom;

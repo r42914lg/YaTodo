@@ -5,7 +5,6 @@ import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 
 object FirebaseHelper {
-
     private const val SERVER_ERROR_EVENT = "backend_error"
     private const val USER_LOGIN_EVENT = "user_login"
     private const val USER_LOGOUT_EVENT = "user_logout"
@@ -26,6 +25,4 @@ object FirebaseHelper {
         val bundle = Bundle().apply { putString(USER_NAME, s) }
         Firebase.analytics.logEvent(USER_LOGOUT_EVENT, bundle)
     }
-
-
 }

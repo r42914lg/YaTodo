@@ -17,7 +17,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'com.r42914lg.arkados.yatodo.MockTestRunner'
     }
 
     buildTypes {
@@ -38,6 +38,12 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -75,8 +81,23 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.2'
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
+    implementation 'com.squareup.okhttp3:okhttp-tls:4.10.0'
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    implementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'org.robolectric:robolectric:4.8'
+    testImplementation 'org.mockito:mockito-inline:4.0.0'
+
+    androidTestImplementation 'androidx.test:core-ktx:1.4.0'
+    debugImplementation 'androidx.test:core-ktx:1.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'com.squareup.okhttp3:mockwebserver:4.10.0'
+    androidTestImplementation 'com.jakewharton.espresso:okhttp3-idling-resource:1.0.0'
+    androidTestImplementation 'com.squareup.okhttp3:okhttp-tls:4.10.0'
 }

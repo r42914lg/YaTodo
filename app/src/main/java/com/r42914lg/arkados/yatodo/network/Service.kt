@@ -1,16 +1,22 @@
 package com.r42914lg.arkados.yatodo.network
 
+import android.annotation.SuppressLint
 import android.app.Application
-import com.r42914lg.arkados.yatodo.YaTodoApp.Companion.BASE_URL
-import com.r42914lg.arkados.yatodo.utils.UserManager
+import com.r42914lg.arkados.yatodo.BuildConfig
+import com.r42914lg.arkados.yatodo.IMyApp
+import com.r42914lg.arkados.yatodo.utils.IUserManager
 import com.squareup.moshi.JsonClass
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.tls.HandshakeCertificates
+import okhttp3.tls.HeldCertificate
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.PATCH
+import java.net.InetAddress
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,32 +30,23 @@ interface TodoService {
 
 @Singleton
 class TodoNetwork @Inject constructor(
-    private val authInterceptor: AuthInterceptor,
-    private val app: Application
+    okHttpProvider: IOkHttpProvider,
+    app: Application
 ) {
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl((app as IMyApp).baseUrl)
         .addConverterFactory(MoshiConverterFactory.create())
-        .client(okhttpClient())
+        .client(okHttpProvider.getOkHttpClient())
         .build()
 
     private val _service: TodoService = retrofit.create(TodoService::class.java)
     val service: TodoService
         get() = _service
-
-    private fun okhttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-//  for testing purposes uncomment and add certificate file to /resources -->
-//            .hostnameVerifier { _, _ -> true } // ignore hostname verification for testing purposes
-//            .sslSocketFactory(SslUtils.getSslContextForCertificateFile("mypublic.cert", app).socketFactory)
-            .addInterceptor(authInterceptor)
-            .build()
-    }
 }
 
 @Singleton
-class AuthInterceptor @Inject constructor(private val userManager: UserManager) : Interceptor {
+class AuthInterceptor @Inject constructor(private val userManager: IUserManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val requestBuilder = chain.request().newBuilder()
         userManager.token?.let {

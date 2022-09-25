@@ -16,13 +16,13 @@ import com.r42914lg.arkados.yatodo.model.DetailsVm
 import com.r42914lg.arkados.yatodo.model.MainVm
 import com.r42914lg.arkados.yatodo.model.VmFactory
 import com.r42914lg.arkados.yatodo.ui.presenter.MainPresenter
-import com.r42914lg.arkados.yatodo.utils.PermissionsHelper
+import com.r42914lg.arkados.yatodo.utils.IPermissionsHelper
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), IMainView {
 
     @Inject
-    lateinit var permissionsHelper: PermissionsHelper
+    lateinit var permissionsHelper: IPermissionsHelper
 
     private lateinit var binding: ActivityMainBinding
 
@@ -55,8 +55,9 @@ class MainActivity : AppCompatActivity(), IMainView {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DaggerActivityComponent.factory().create(this)
+        DaggerActivityComponent.factory().create(getAppComponent(), this)
             .inject(this)
+        permissionsHelper.checkPermissions(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
