@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="markCompleteColor" format="reference|color"/>
+    <attr name="swipeDeleteColor" format="reference|color"/>
+    <attr name="iconsColor" format="reference|color"/>
+    <attr name="recyclerAndEditTextAreaColor" format="reference|color"/>
+    <attr name="disableColor" format="reference|color"/>
+    <attr name="themeBackground" format="reference|color"/>
+</resources>
