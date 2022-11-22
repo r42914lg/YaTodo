@@ -2,11 +2,13 @@ package com.r42914lg.arkados.yatodo.ui
 
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.r42914lg.arkados.yatodo.FileReader
 import com.r42914lg.arkados.yatodo.R
+import com.r42914lg.arkados.yatodo.idling.EspressoIdlingResource
 import com.r42914lg.arkados.yatodo.network.CertificateWrapper
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -30,6 +32,7 @@ class MainActivityTest {
 
     @Before
     fun setup() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getIdlingResource())
         mockWebServer.useHttps(serverCertificates.sslSocketFactory(), false)
         mockWebServer.start(8443)
     }
@@ -37,6 +40,7 @@ class MainActivityTest {
     @After
     fun teardown() {
         mockWebServer.shutdown()
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getIdlingResource())
     }
 
     @Test
